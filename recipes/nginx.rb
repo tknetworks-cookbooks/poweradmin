@@ -1,10 +1,5 @@
 #
-# Cookbook Name:: poweradmin
-# Recipe:: default
-#
 # Author:: Ken-ichi TANABE (<nabeken@tknetworks.org>)
-#
-# Copyright 2012, TANABE Ken-ichi
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,35 +13,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
 include_recipe "nginx"
-include_recipe "poweradmin"
-include_recipe "php::fpm"
 
-nginx_site node[:poweradmin][:vhost] do
-  use_php_fpm true
+if node['poweradmin']['use_php_fpm_pool_www']
+  include_recipe 'php_fpm::www'
+end
+
+nginx_site_conf node['poweradmin']['vhost'] do
+  use_php_fpm true, node['poweradmin']['php_fpm_pool']
   use_https   true
   create_htdocs false
 end
 
-# basic認証のファイル
-template "#{node[:nginx][:dir]}/poweradmin.htpasswd" do
-  source "poweradmin.htpasswd"
-  owner node[:nginx][:user]
-  group node[:nginx][:gid]
-  mode 0600
+nginx_site node['poweradmin']['vhost'] do
+  enable true
 end
 
-# nginxのセットアップ
-template "/var/www/#{node[:poweradmin][:vhost]}/nginx.conf" do
-  source "nginx.conf"
-  owner node[:nginx][:user]
-  group node[:nginx][:gid]
+template "#{node['nginx']['dir']}/poweradmin.htpasswd" do
+  source "poweradmin.htpasswd.erb"
+  owner node['nginx']['user']
+  group node['nginx']['gid']
+  mode 0600
+  variables :user => node['poweradmin']['htpasswd']['user'],
+            :password => node['poweradmin']['htpasswd']['password']
+end
+
+template "/var/www/#{node['poweradmin']['vhost']}/nginx.conf" do
+  source "nginx.conf.erb"
+  owner node['nginx']['user']
+  group node['nginx']['gid']
   notifies :restart, "service[nginx]"
 end
 
-# htdocsをpoweradminへ向ける
-link "/var/www/#{node[:poweradmin][:vhost]}/htdocs" do
+link "/var/www/#{node['poweradmin']['vhost']}/htdocs" do
   action :create
-  to node[:poweradmin][:install_dir]
+  to node['poweradmin']['install_dir']
 end

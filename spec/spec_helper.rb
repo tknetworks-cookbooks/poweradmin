@@ -13,27 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-node['poweradmin']['packages'].each do |pkg|
-  package pkg do
-    action :install
-    source "ports" if node['platform'] == "freebsd"
-  end
-end
+require 'chefspec'
 
-git node['poweradmin']['install_dir'] do
-  user node['nginx']['user']
-  group node['nginx']['group']
-  repository node['poweradmin']['git']['repository']
-  reference node['poweradmin']['git']['tag']
-  action :sync
-  not_if do
-    ::File.exists?(node['poweradmin']['install_dir'])
+shared_context 'debian' do
+  def set_node(node)
+    node.automatic_attrs['platform'] = 'debian'
+    node.automatic_attrs['kernel']['machine'] = 'x86_64'
+    node.automatic_attrs['etc']['passwd']['root']['gid'] = 0
   end
-end
-
-template "#{node['poweradmin']['install_dir']}/inc/config.inc.php" do
-  owner node['nginx']['user']
-  group node['nginx']['group']
-  mode 0640
-  source "config.inc.php.erb"
 end

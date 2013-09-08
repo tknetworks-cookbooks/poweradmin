@@ -1,19 +1,29 @@
-default[:poweradmin][:git_repository] = "git://github.com/poweradmin/poweradmin.git"
-default[:poweradmin][:version] = "v2.1.5"
-default[:poweradmin][:dns_hostmaster] = "hostmaster.example.com"
-default[:poweradmin][:dns_ns1] = "ns1.example.com"
-default[:poweradmin][:dns_ns2] = "ns2.example.com"
+#
+# Author:: Ken-ichi TANABE (<nabeken@tknetworks.org>)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+default['poweradmin']['git']['repository'] = "git://github.com/poweradmin/poweradmin.git"
+default['poweradmin']['git']['tag'] = "v2.1.5"
+default['poweradmin']['dns']['hostmaster'] = "hostmaster.example.com"
+default['poweradmin']['dns']['ns1'] = "ns1.example.com"
+default['poweradmin']['dns']['ns2'] = "ns2.example.com"
 
-case platform
-when "freebsd"
-  default[:poweradmin][:packages] = %w{
-    databases/pear-MDB2_Driver_pgsql
-  }
-  default[:poweradmin][:install_dir] = "/usr/local/www/poweradmin"
+case node['platform']
 when "debian"
-  default[:poweradmin][:packages] = %w{
+  default['poweradmin']['packages'] = %w{
     php-mdb2-driver-pgsql
     php5-mcrypt
   }
-  default[:poweradmin][:install_dir] = "/var/www/poweradmin"
+  default['poweradmin']['install_dir'] = "/var/www/poweradmin"
 end
