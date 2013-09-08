@@ -32,7 +32,7 @@ end
 template "#{node['nginx']['dir']}/poweradmin.htpasswd" do
   source "poweradmin.htpasswd.erb"
   owner node['nginx']['user']
-  group node['nginx']['gid']
+  group node['nginx']['group']
   mode 0600
   variables :user => node['poweradmin']['htpasswd']['user'],
             :password => node['poweradmin']['htpasswd']['password']
@@ -41,7 +41,8 @@ end
 template "/var/www/#{node['poweradmin']['vhost']}/nginx.conf" do
   source "nginx.conf.erb"
   owner node['nginx']['user']
-  group node['nginx']['gid']
+  group node['nginx']['group']
+  mode 0750
   notifies :restart, "service[nginx]"
 end
 
