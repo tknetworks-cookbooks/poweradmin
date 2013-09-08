@@ -51,7 +51,7 @@ describe 'poweradmin::default' do
 
     it 'should create htpasswd file' do
       expect(chef_run)
-      .to create_file_with_content "#{chef_run.node['nginx']['dir']}/poweradmin.htpasswd", "poweradmin:Poweradmin:secret"
+      .to create_file_with_content "#{chef_run.node['nginx']['dir']}/poweradmin.htpasswd", "poweradmin:secret:Poweradmin"
     end
 
     it 'should create nginx.conf' do
