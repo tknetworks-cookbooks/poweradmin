@@ -8,13 +8,40 @@ platforms:
   driver_config:
     box: debian-wheezy
     box_url: http://projects.tsuntsun.net/~nabeken/boxes/vagrant-debian-wheezy.box
+    network:
+    - ["forwarded_port", {guest: 443, host: 10443}]
   run_list:
   - recipe[apt]
+  - recipe[debian]
 
 suites:
 - name: default
+  encrypted_data_bag_secret_key_path: test/integration/secret_key
   run_list:
-  - recipe[php_fpm]
-  - recipe[php_fpm::www]
-  - recipe[php_fpm_test::www_template]
+  - recipe[postgresql::ruby]
+  - recipe[postgresql::server]
+  - recipe[pdns]
+  - recipe[pdns::backup]
+  - recipe[poweradmin]
+  - recipe[poweradmin::nginx]
   - recipe[minitest-handler]
+  attributes:
+    pdns:
+      axfr_ipts:
+      - "10.0.0.1"
+      db_password: "pdns"
+      backup:
+        repository: "https://gist.github.com/a59c16a1c595e061c314.git"
+    postgresql:
+      password:
+        postgres: "test"
+    poweradmin:
+      vhost: "ns.example.org"
+      dns:
+        hostmaster: "hostmaster.example.org"
+        ns1: "ns1.example.org"
+        ns2: "ns2.example.org"
+      htpasswd:
+        user: "admin"
+        password: "$apr1$sK3MsxNl$pCcSJdCiCRZZBbpZt7eC21"
+        raw_password: "test"

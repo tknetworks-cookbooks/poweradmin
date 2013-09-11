@@ -2,13 +2,24 @@ site :opscode
 
 metadata
 
-cookbook "debian", git: "git://github.com/tknetworks-cookbooks/debian.git"
-cookbook "pdns", git: "git://github.com/tknetworks-cookbooks/pdns.git"
-cookbook "nginx", git: "git://github.com/tknetworks-cookbooks/nginx.git"
-cookbook "tknetworks_nginx", git: "git://github.com/tknetworks-cookbooks/tknetworks_nginx.git"
-cookbook "php_fpm", git: "git://github.com/tknetworks-cookbooks/php_fpm.git"
+%w{
+  debian
+  nginx
+  tknetworks_nginx
+  php_fpm
+  postgresql
+}.each do |c|
+  cookbook c, git: "git://github.com/tknetworks-cookbooks/#{c}.git"
+end
 
 group :integration do
   cookbook 'apt'
+
+  %w{
+    postgresql
+    pdns
+  }.each do |c|
+    cookbook c, git: "git://github.com/tknetworks-cookbooks/#{c}.git"
+  end
   cookbook 'minitest-handler'
 end

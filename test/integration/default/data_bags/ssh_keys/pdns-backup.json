@@ -1,0 +1,9 @@
+{
+  "id": "pdns-backup",
+  "key": {
+    "encrypted_data": "u6T4jDK8wqDC9GIJfCrZym3YJHFx8h/vFkpLpwX1Vj4=\n",
+    "iv": "sfvPot7i+vawpaMkZA1//g==\n",
+    "version": 1,
+    "cipher": "aes-256-cbc"
+  }
+}

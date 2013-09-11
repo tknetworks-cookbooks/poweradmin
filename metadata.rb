@@ -10,6 +10,6 @@ name             "poweradmin"
   supports os
 end
 
-%w{postgresql pdns php_fpm nginx tknetworks_nginx}.each do |c|
+%w{debian postgresql pdns php_fpm nginx tknetworks_nginx}.each do |c|
   depends c
 end

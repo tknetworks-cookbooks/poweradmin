@@ -20,6 +20,14 @@ node['poweradmin']['packages'].each do |pkg|
   end
 end
 
+# For some systems which does not have /var/www by default
+directory "/var/www" do
+  action :create
+  user node['nginx']['user']
+  group node['nginx']['group']
+  mode 0755
+end
+
 git node['poweradmin']['install_dir'] do
   user node['nginx']['user']
   group node['nginx']['group']
