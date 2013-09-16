@@ -22,6 +22,7 @@ end
 
 desc 'Runs berkshelf'
 task :berkshelf do
+  teardown_berkshelf
   berkshelf
 end
 
@@ -49,6 +50,10 @@ end
 
 def berkshelf
   sh "berks install --path vendor/cookbooks"
+end
+
+def teardown_berkshelf
+  rm_rf 'vendor'
 end
 
 begin
