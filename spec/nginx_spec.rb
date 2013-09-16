@@ -19,7 +19,7 @@ describe 'poweradmin::default' do
   include_context 'debian'
 
   let (:chef_run) {
-    ChefSpec::ChefRunner.new() do |node|
+    ChefSpec::ChefRunner.new(:evaluate_guards => true) do |node|
       set_node(node)
     end
   }
@@ -33,6 +33,9 @@ describe 'poweradmin::default' do
         'key1' => 'key1',
         'key2' => 'key2'
       }
+    )
+    Chef::Resource.any_instance.stub(:shell_out).and_return(
+      double('shell_out').tap { |m| m.stub(:exitstatus).and_return(3) }
     )
   end
 
@@ -82,6 +85,68 @@ describe 'poweradmin::default' do
 
     it 'should not include php_fpm::www recipe' do
       expect(chef_run).not_to include_recipe 'php_fpm::www'
+    end
+  end
+
+  shared_examples_for 'remove_installer == false' do
+    it 'should not remove installer' do
+      chef_run.converge('poweradmin::nginx')
+      expect(chef_run)
+      .not_to delete_directory("#{chef_run.node['poweradmin']['install_dir']}/install")
+      .with(:recursive => true)
+    end
+  end
+
+  shared_examples_for 'remove_installer == true' do
+    it 'should remove installer' do
+      chef_run.converge('poweradmin::nginx')
+      expect(chef_run)
+      .to delete_directory("#{chef_run.node['poweradmin']['install_dir']}/install")
+      .with(:recursive => true)
+    end
+  end
+
+  describe 'when users table found' do
+    before do
+      Chef::Resource.any_instance.stub(:shell_out).and_return(double(:exitstatus => 0))
+    end
+
+    context 'and actualy set remove_installer == false' do
+      before do
+        chef_run.node.set['poweradmin']['remove_installer'] = false
+      end
+
+      it_behaves_like 'remove_installer == false'
+    end
+
+    context 'and actualy set remove_installer == true' do
+      before do
+        chef_run.node.set['poweradmin']['remove_installer'] = true
+      end
+
+      it_behaves_like 'remove_installer == true'
+    end
+  end
+
+  describe 'when no users table found' do
+    before do
+      Chef::Resource.any_instance.stub(:shell_out).and_return(double(:exitstatus => 3))
+    end
+
+    context 'and actualy set remove_installer == false' do
+      before do
+        chef_run.node.set['poweradmin']['remove_installer'] = false
+      end
+
+      it_behaves_like 'remove_installer == false'
+    end
+
+    context 'and actualy set remove_installer == true' do
+      before do
+        chef_run.node.set['poweradmin']['remove_installer'] = true
+      end
+
+      it_behaves_like 'remove_installer == false'
     end
   end
 end

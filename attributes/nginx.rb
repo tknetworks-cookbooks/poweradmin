@@ -18,3 +18,4 @@ default['poweradmin']['use_php_fpm_pool_www'] = true
 default['poweradmin']['php_fpm_pool'] = 'www'
 default['poweradmin']['htpasswd']['user'] = 'poweradmin'
 default['poweradmin']['htpasswd']['password'] = 'secret'
+default['poweradmin']['remove_installer'] = true

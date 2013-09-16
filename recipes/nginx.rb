@@ -13,6 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+require 'chef/mixin/shell_out'
+extend Chef::Mixin::ShellOut
+
 include_recipe "nginx"
 
 if node['poweradmin']['use_php_fpm_pool_www']
@@ -49,4 +52,19 @@ end
 link "/var/www/#{node['poweradmin']['vhost']}/htdocs" do
   action :create
   to node['poweradmin']['install_dir']
+end
+
+directory "#{node['poweradmin']['install_dir']}/install" do
+  action :delete
+  recursive true
+  not_if do
+    cmd = shell_out("psql --set ON_ERROR_STOP=yes -U %{db_user} %{db_name} > /dev/null 2>&1" % {
+        :db_user => node['pdns']['db_user'],
+        :db_name => node['pdns']['db_name'],
+      },
+      :input => '\d users;',
+      :user => 'pdns'
+    )
+    cmd.exitstatus != 0 || !node['poweradmin']['remove_installer']
+  end
 end
